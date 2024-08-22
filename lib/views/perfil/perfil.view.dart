@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:clinica_medica/components/bottom_nav_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:clinica_medica/views/perfil/editar_perfil.view.dart';
 
 class PerfilView extends StatelessWidget {
   const PerfilView({super.key});
@@ -18,7 +19,7 @@ class PerfilView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 80),
               const Text(
                 'Perfil',
                 style: titulo,
@@ -70,7 +71,13 @@ class PerfilView extends StatelessWidget {
                               size: 30,
                             ),
                             onPressed: () {
-                              // Navegar para a tela de edição de perfil
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const EditarPerfilView(),
+                                ),
+                              );
                             },
                           ),
                         ],

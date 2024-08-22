@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:clinica_medica/views/agenda/agenda.view.dart';
 import 'package:clinica_medica/views/perfil/perfil.view.dart';
+import 'package:clinica_medica/views/consulta/agendar_consulta.view.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -45,8 +46,7 @@ class BottomNavBar extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    const AgendaView()), //atualizar para agendar consulta
+                builder: (context) => const AgendarConsultaView()),
           );
         } else if (index == 2) {
           Navigator.push(

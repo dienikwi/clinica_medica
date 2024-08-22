@@ -15,7 +15,7 @@ class HomeView extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: <Widget>[
-              const SizedBox(height: 40),
+              const SizedBox(height: 80),
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Column(

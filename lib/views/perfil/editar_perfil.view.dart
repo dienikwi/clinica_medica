@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:clinica_medica/views/home/home.view.dart';
-import 'package:clinica_medica/views/agenda/agenda.view.dart';
+import 'package:clinica_medica/components/bottom_nav_bar.dart';
 
-class CadastroView extends StatefulWidget {
-  const CadastroView({super.key});
+class EditarPerfilView extends StatefulWidget {
+  const EditarPerfilView({super.key});
 
   @override
-  _CadastroViewState createState() => _CadastroViewState();
+  _EditarPerfilViewState createState() => _EditarPerfilViewState();
 }
 
-class _CadastroViewState extends State<CadastroView> {
+class _EditarPerfilViewState extends State<EditarPerfilView> {
   DateTime? _selectedDate;
+  final TextEditingController _nomeController = TextEditingController();
+  final TextEditingController _generoController = TextEditingController();
+  final TextEditingController _dataNascimentoController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -30,23 +33,20 @@ class _CadastroViewState extends State<CadastroView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Vamos iniciar,',
-                      style: titulo,
-                    ),
-                    Text(
-                      'realize seu cadastro!',
+                      'Editar Perfil',
                       style: titulo,
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 40),
-              const TextField(
-                decoration: InputDecoration(
+              TextField(
+                controller: _nomeController,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
-                  labelText: 'nome',
+                  labelText: 'Nome',
                   prefixIcon: Icon(Icons.person),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),
@@ -55,39 +55,6 @@ class _CadastroViewState extends State<CadastroView> {
                   floatingLabelStyle: TextStyle(color: Colors.blue),
                   contentPadding: EdgeInsets.symmetric(vertical: 12),
                 ),
-              ),
-              const SizedBox(height: 20),
-              const TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                  ),
-                  labelText: 'email',
-                  prefixIcon: Icon(Icons.email),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blue),
-                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                  ),
-                  floatingLabelStyle: TextStyle(color: Colors.blue),
-                  contentPadding: EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                  ),
-                  labelText: 'senha',
-                  prefixIcon: Icon(Icons.lock),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blue),
-                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                  ),
-                  floatingLabelStyle: TextStyle(color: Colors.blue),
-                  contentPadding: EdgeInsets.symmetric(vertical: 12),
-                ),
-                obscureText: true,
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(
@@ -114,10 +81,15 @@ class _CadastroViewState extends State<CadastroView> {
                     child: Text('Masculino'),
                   ),
                 ],
-                onChanged: (String? newValue) {},
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _generoController.text = newValue ?? '';
+                  });
+                },
               ),
               const SizedBox(height: 20),
               TextFormField(
+                controller: _dataNascimentoController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
@@ -142,14 +114,11 @@ class _CadastroViewState extends State<CadastroView> {
                   if (pickedDate != null) {
                     setState(() {
                       _selectedDate = pickedDate;
+                      _dataNascimentoController.text =
+                          "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
                     });
                   }
                 },
-                controller: TextEditingController(
-                  text: _selectedDate != null
-                      ? "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}"
-                      : '',
-                ),
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -160,40 +129,20 @@ class _CadastroViewState extends State<CadastroView> {
                     foregroundColor: Colors.white,
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AgendaView(),
-                      ),
-                    );
+                    // Salvar as alterações e navegar para outra tela
                   },
-                  child: const Text('Cadastrar'),
+                  child: const Text('Salvar'),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Text("Já possui uma conta?"),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.blue,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomeView(),
-                        ),
-                      );
-                    },
-                    child: const Text('Faça seu login'),
-                  ),
-                ],
               ),
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: 2,
+        onTap: (index) {
+          // Lógica de navegação baseada no índice
+        },
       ),
     );
   }
