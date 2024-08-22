@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinica_medica/views/cadastro/cadastro.view.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -14,7 +15,7 @@ class HomeView extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: <Widget>[
-              const SizedBox(height: 80),
+              const SizedBox(height: 40),
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Column(
@@ -44,6 +45,7 @@ class HomeView extends StatelessWidget {
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
                   floatingLabelStyle: TextStyle(color: Colors.blue),
+                  contentPadding: EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
               const SizedBox(height: 20),
@@ -59,6 +61,7 @@ class HomeView extends StatelessWidget {
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
                   floatingLabelStyle: TextStyle(color: Colors.blue),
+                  contentPadding: EdgeInsets.symmetric(vertical: 12),
                 ),
                 obscureText: true,
               ),
@@ -83,7 +86,14 @@ class HomeView extends StatelessWidget {
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.blue,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CadastroView(),
+                        ),
+                      );
+                    },
                     child: const Text('Faça seu cadastro'),
                   ),
                 ],
