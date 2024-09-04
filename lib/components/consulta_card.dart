@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class ConsultaCard extends StatelessWidget {
   final String especialidade;
-  final String paciente;
+  final String medico;
   final String dataHora;
 
   const ConsultaCard({
     super.key,
     required this.especialidade,
-    required this.paciente,
+    required this.medico,
     required this.dataHora,
   });
 
@@ -35,7 +35,7 @@ class ConsultaCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                paciente,
+                medico,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),

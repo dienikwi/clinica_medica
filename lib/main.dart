@@ -1,6 +1,6 @@
+import 'package:clinica_medica/views/perfil/perfil.view.dart';
 import 'package:flutter/material.dart';
 import 'package:clinica_medica/views/themes/light.theme.dart';
-import 'package:clinica_medica/views/home/home.view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +18,7 @@ class Root extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: lightTheme,
-      home: const HomeView(),
+      home: const PerfilView(),
     );
   }
 }

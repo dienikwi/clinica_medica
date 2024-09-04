@@ -1,32 +1,65 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:clinica_medica/components/bottom_nav_bar.dart';
 import 'package:clinica_medica/components/consulta_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:clinica_medica/views/consulta/agendar_consulta.view.dart';
-import 'package:clinica_medica/views/consulta/detalhes_consulta.view.dart'; // Importar a nova tela
+import 'package:clinica_medica/views/consulta/detalhes_consulta.view.dart';
 
-class AgendaView extends StatelessWidget {
+class AgendaView extends StatefulWidget {
   const AgendaView({super.key});
+
+  @override
+  _AgendaViewState createState() => _AgendaViewState();
+}
+
+class _AgendaViewState extends State<AgendaView> {
+  List<Map<String, dynamic>> consultas = [];
+  bool temConsultas = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchConsultas();
+  }
+
+  Future<void> _fetchConsultas() async {
+    var idPessoa = 3;
+    final response = await http.get(Uri.parse(
+        'http://200.19.1.19/20221GR.ADS0013/clinica_medica/Controller/CrudAgendamento.php?Operacao=CON&id_pessoa=$idPessoa'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body.toString());
+
+      if (data == null) {
+        setState(() {
+          temConsultas = false;
+        });
+      } else {
+        setState(() {
+          consultas = List<Map<String, dynamic>>.from(data.map((consulta) => {
+                'especialidade': consulta['nm_especialidade']?.toString(),
+                'idMedico': consulta['id_medico'],
+                'medico': consulta['nm_medico']?.toString(),
+                'data': consulta['dt_consulta']?.toString(),
+                'hora': consulta['hr_inicio']?.toString(),
+                'dataHora':
+                    '${consulta['dt_consulta']}, ${consulta['hr_inicio']}',
+              }));
+        });
+      }
+    } else {
+      setState(() {
+        temConsultas = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     const TextStyle titulo = TextStyle(fontSize: 20);
     const TextStyle buttonTextStyle = TextStyle(fontSize: 18);
-
-    // Simulação de dados de consulta
-    bool temConsultas = true;
-    List<Map<String, String>> consultas = [
-      {
-        'especialidade': 'Cardiologia',
-        'paciente': 'Luísa Martins Castilhos',
-        'dataHora': '10/02/2025, 14:30',
-      },
-      {
-        'especialidade': 'Dermatologia',
-        'paciente': 'Carlos Ferreira de Castro',
-        'dataHora': '23/03/2025, 13:30',
-      },
-    ];
 
     return Scaffold(
       backgroundColor: Colors.grey[200],
@@ -123,13 +156,17 @@ class AgendaView extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const DetalhesConsultaView(),
+                            builder: (context) => DetalhesConsultaView(
+                              idMedico: consulta['idMedico']!,
+                              data: consulta['data']!,
+                              hora: consulta['hora']!,
+                            ),
                           ),
                         );
                       },
                       child: ConsultaCard(
                         especialidade: consulta['especialidade']!,
-                        paciente: consulta['paciente']!,
+                        medico: consulta['medico']!,
                         dataHora: consulta['dataHora']!,
                       ),
                     ),
