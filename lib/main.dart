@@ -1,4 +1,4 @@
-import 'package:clinica_medica/views/perfil/perfil.view.dart';
+import 'package:clinica_medica/views/cadastro/cadastro.view.dart';
 import 'package:flutter/material.dart';
 import 'package:clinica_medica/views/themes/light.theme.dart';
 
@@ -18,7 +18,7 @@ class Root extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: lightTheme,
-      home: const PerfilView(),
+      home: const CadastroView(),
     );
   }
 }

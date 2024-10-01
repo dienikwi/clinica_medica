@@ -1,7 +1,9 @@
+import 'package:clinica_medica/views/home/home.view.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:clinica_medica/components/bottom_nav_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetalhesConsultaView extends StatefulWidget {
   final int idMedico;
@@ -20,17 +22,36 @@ class DetalhesConsultaView extends StatefulWidget {
 }
 
 class _DetalhesConsultaViewState extends State<DetalhesConsultaView> {
+  int? idPessoa;
   late Map<String, dynamic> consultaDetalhes;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchDetalhesConsulta();
+    _loadIdPessoa();
+  }
+
+  Future<int?> _getIdPessoa() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('id_pessoa');
+  }
+
+  Future<void> _loadIdPessoa() async {
+    idPessoa = await _getIdPessoa();
+    if (idPessoa != null) {
+      _fetchDetalhesConsulta();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeView(),
+        ),
+      );
+    }
   }
 
   Future<void> _fetchDetalhesConsulta() async {
-    var idPessoa = 3;
     final response = await http.get(Uri.parse(
         'http://200.19.1.19/20221GR.ADS0013/clinica_medica/Controller/CrudDetalhesConsulta.php?Operacao=CON&id_pessoa=$idPessoa&id_medico=${widget.idMedico}&dt_consulta=${widget.data}&hr_inicio=${widget.hora}'));
     if (response.statusCode == 200) {

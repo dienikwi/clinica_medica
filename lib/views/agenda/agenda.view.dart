@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:clinica_medica/views/home/home.view.dart';
 import 'package:flutter/material.dart';
 import 'package:clinica_medica/components/bottom_nav_bar.dart';
 import 'package:clinica_medica/components/consulta_card.dart';
@@ -6,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:clinica_medica/views/consulta/agendar_consulta.view.dart';
 import 'package:clinica_medica/views/consulta/detalhes_consulta.view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AgendaView extends StatefulWidget {
   const AgendaView({super.key});
@@ -15,17 +17,36 @@ class AgendaView extends StatefulWidget {
 }
 
 class _AgendaViewState extends State<AgendaView> {
+  int? idPessoa;
   List<Map<String, dynamic>> consultas = [];
   bool temConsultas = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchConsultas();
+    _loadIdPessoa();
+  }
+
+  Future<int?> _getIdPessoa() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('id_pessoa');
+  }
+
+  Future<void> _loadIdPessoa() async {
+    idPessoa = await _getIdPessoa();
+    if (idPessoa != null) {
+      _fetchConsultas();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeView(),
+        ),
+      );
+    }
   }
 
   Future<void> _fetchConsultas() async {
-    var idPessoa = 3;
     final response = await http.get(Uri.parse(
         'http://200.19.1.19/20221GR.ADS0013/clinica_medica/Controller/CrudAgendamento.php?Operacao=CON&id_pessoa=$idPessoa'));
 

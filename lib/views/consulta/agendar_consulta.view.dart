@@ -1,8 +1,10 @@
 import 'package:clinica_medica/views/agenda/agenda.view.dart';
+import 'package:clinica_medica/views/home/home.view.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:clinica_medica/components/bottom_nav_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AgendarConsultaView extends StatefulWidget {
   const AgendarConsultaView({super.key});
@@ -12,6 +14,7 @@ class AgendarConsultaView extends StatefulWidget {
 }
 
 class _AgendarConsultaViewState extends State<AgendarConsultaView> {
+  int? idPessoa;
   DateTime? _selectedDate;
   String? _selectedHorario;
   final _formKey = GlobalKey<FormState>();
@@ -29,7 +32,26 @@ class _AgendarConsultaViewState extends State<AgendarConsultaView> {
   @override
   void initState() {
     super.initState();
-    _fetchUnidades();
+    _loadIdPessoa();
+  }
+
+  Future<int?> _getIdPessoa() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('id_pessoa');
+  }
+
+  Future<void> _loadIdPessoa() async {
+    idPessoa = await _getIdPessoa();
+    if (idPessoa != null) {
+      _fetchUnidades();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeView(),
+        ),
+      );
+    }
   }
 
   Future<void> _fetchUnidades() async {
@@ -139,7 +161,7 @@ class _AgendarConsultaViewState extends State<AgendarConsultaView> {
       final uri = Uri.parse(
               'http://200.19.1.19/20221GR.ADS0013/clinica_medica/Controller/CrudAgendamento.php')
           .replace(queryParameters: {
-        'id_usuario': '3',
+        'id_usuario': idPessoa.toString(),
         'id_unidade': _selectedUnidade.toString(),
         'id_especialidade': _selectedEspecialidadeId.toString(),
         'id_medico': _selectedMedico.toString(),

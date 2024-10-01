@@ -1,21 +1,57 @@
+import 'package:clinica_medica/views/home/home.view.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:clinica_medica/components/bottom_nav_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:clinica_medica/views/perfil/editar_perfil.view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PerfilView extends StatelessWidget {
+class PerfilView extends StatefulWidget {
   const PerfilView({super.key});
 
+  @override
+  _PerfilViewState createState() => _PerfilViewState();
+}
+
+class _PerfilViewState extends State<PerfilView> {
+  int? idPessoa;
+  Future<Map<String, dynamic>>? fetchDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadIdPessoa();
+  }
+
+  Future<int?> _getIdPessoa() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('id_pessoa');
+  }
+
+  Future<void> _loadIdPessoa() async {
+    idPessoa = await _getIdPessoa();
+    if (idPessoa != null) {
+      setState(() {
+        fetchDataFuture = fetchData();
+      });
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeView(),
+        ),
+      );
+    }
+  }
+
   Future<Map<String, dynamic>> fetchData() async {
-    var idPessoa = 3;
     final response = await http.get(Uri.parse(
         'http://200.19.1.19/20221GR.ADS0013/clinica_medica/Controller/CrudPessoa.php?Operacao=CON&id_pessoa=$idPessoa'));
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Servico indisponivel');
+      throw Exception('Serviço indisponível');
     }
   }
 
@@ -39,7 +75,7 @@ class PerfilView extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               FutureBuilder<Map<String, dynamic>>(
-                future: fetchData(),
+                future: fetchDataFuture, // Usando fetchDataFuture
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

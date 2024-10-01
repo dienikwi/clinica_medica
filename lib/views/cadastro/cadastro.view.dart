@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'package:clinica_medica/views/home/home.view.dart';
-import 'package:clinica_medica/views/agenda/agenda.view.dart';
 
 class CadastroView extends StatefulWidget {
   const CadastroView({super.key});
@@ -10,7 +12,75 @@ class CadastroView extends StatefulWidget {
 }
 
 class _CadastroViewState extends State<CadastroView> {
+  final TextEditingController _nomeController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _senhaController = TextEditingController();
+  String? _generoSelecionado;
   DateTime? _selectedDate;
+  bool _obscureText = true;
+
+  Future<void> _cadastrarUsuario() async {
+    final nome = _nomeController.text;
+    final email = _emailController.text;
+    final senha = _senhaController.text;
+    final genero = _generoSelecionado;
+    final dataNascimento = _selectedDate != null
+        ? "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}"
+        : '';
+
+    if (nome.isEmpty ||
+        email.isEmpty ||
+        senha.isEmpty ||
+        genero == null ||
+        dataNascimento.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Todos os campos devem ser preenchidos.')),
+      );
+      return;
+    }
+
+    final String url =
+        "http://200.19.1.19/20221GR.ADS0013/clinica_medica/Controller/CrudPessoa.php";
+
+    try {
+      final response = await http.post(
+        Uri.parse(
+            '$url?Operacao=CAD&nm_pessoa=$nome&nm_genero=$genero&dt_nascimento=$dataNascimento&des_email=$email&des_senha=$senha'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+
+        if (jsonResponse.containsKey('erro')) {
+          if (jsonResponse['erro'] == 'Erro ao cadastrar pessoa') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('Esse email já existe. Tente outro.')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Erro: ${jsonResponse['erro']}')),
+            );
+          }
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeView()),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Erro na conexão com o servidor. Código: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +111,9 @@ class _CadastroViewState extends State<CadastroView> {
                 ),
               ),
               const SizedBox(height: 40),
-              const TextField(
-                decoration: InputDecoration(
+              TextField(
+                controller: _nomeController,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
@@ -57,8 +128,9 @@ class _CadastroViewState extends State<CadastroView> {
                 ),
               ),
               const SizedBox(height: 20),
-              const TextField(
-                decoration: InputDecoration(
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
@@ -73,21 +145,32 @@ class _CadastroViewState extends State<CadastroView> {
                 ),
               ),
               const SizedBox(height: 20),
-              const TextField(
+              TextField(
+                controller: _senhaController,
+                obscureText: _obscureText,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(
+                  border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
                   labelText: 'senha',
-                  prefixIcon: Icon(Icons.lock),
-                  focusedBorder: OutlineInputBorder(
+                  prefixIcon: const Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  ),
+                  focusedBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.blue),
                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
                   ),
-                  floatingLabelStyle: TextStyle(color: Colors.blue),
-                  contentPadding: EdgeInsets.symmetric(vertical: 12),
+                  floatingLabelStyle: const TextStyle(color: Colors.blue),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                obscureText: true,
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(
@@ -114,7 +197,11 @@ class _CadastroViewState extends State<CadastroView> {
                     child: Text('Masculino'),
                   ),
                 ],
-                onChanged: (String? newValue) {},
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _generoSelecionado = newValue;
+                  });
+                },
               ),
               const SizedBox(height: 20),
               TextFormField(
@@ -159,14 +246,7 @@ class _CadastroViewState extends State<CadastroView> {
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AgendaView(),
-                      ),
-                    );
-                  },
+                  onPressed: _cadastrarUsuario,
                   child: const Text('Cadastrar'),
                 ),
               ),
