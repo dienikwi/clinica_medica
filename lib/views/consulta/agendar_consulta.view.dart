@@ -23,7 +23,6 @@ class _AgendarConsultaViewState extends State<AgendarConsultaView> {
   List<Map<String, dynamic>> _medicos = [];
   List<String> _horariosDisponiveis = [];
   String? _selectedUnidade;
-  String? _selectedEspecialidade;
   String? _selectedMedico;
   String? _selectedEspecialidadeId;
   bool _isHorarioVisible = false;
@@ -227,7 +226,6 @@ class _AgendarConsultaViewState extends State<AgendarConsultaView> {
                       _selectedUnidade = newValue;
                       _especialidades = [];
                       _medicos = [];
-                      _selectedEspecialidade = null;
                       _selectedMedico = null;
                     });
                     _fetchEspecialidades(newValue);
@@ -253,7 +251,6 @@ class _AgendarConsultaViewState extends State<AgendarConsultaView> {
                 onChanged: (String? newValue) {
                   if (newValue != null && _selectedUnidade != null) {
                     setState(() {
-                      _selectedEspecialidade = newValue;
                       _selectedEspecialidadeId = _especialidades.firstWhere(
                               (e) => e['nm_especialidade'] == newValue)[
                           'id_especialidade'];
