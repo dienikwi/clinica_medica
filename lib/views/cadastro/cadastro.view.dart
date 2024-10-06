@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:clinica_medica/views/home/home.view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CadastroView extends StatefulWidget {
   const CadastroView({super.key});
@@ -18,6 +18,21 @@ class _CadastroViewState extends State<CadastroView> {
   String? _generoSelecionado;
   DateTime? _selectedDate;
   bool _obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLogin();
+  }
+
+  Future<void> _checkLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? idPessoa = prefs.getInt('id_pessoa');
+
+    if (idPessoa != null) {
+      Navigator.pushReplacementNamed(context, 'agenda');
+    }
+  }
 
   Future<void> _cadastrarUsuario() async {
     final nome = _nomeController.text;
@@ -39,7 +54,7 @@ class _CadastroViewState extends State<CadastroView> {
       return;
     }
 
-    final String url =
+    const String url =
         "http://200.19.1.19/20221GR.ADS0013/clinica_medica/Controller/CrudPessoa.php";
 
     try {

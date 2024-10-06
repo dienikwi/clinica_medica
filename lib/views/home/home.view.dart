@@ -16,6 +16,21 @@ class _HomeViewState extends State<HomeView> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    _checkLogin();
+  }
+
+  Future<void> _checkLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? idPessoa = prefs.getInt('id_pessoa');
+
+    if (idPessoa != null) {
+      Navigator.pushReplacementNamed(context, 'agenda');
+    }
+  }
+
   Future<void> _login() async {
     if (emailController.text.isEmpty || senhaController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

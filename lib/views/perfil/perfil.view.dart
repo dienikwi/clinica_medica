@@ -45,6 +45,16 @@ class _PerfilViewState extends State<PerfilView> {
     }
   }
 
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('id_pessoa');
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const HomeView()),
+      (route) => false,
+    );
+  }
+
   Future<Map<String, dynamic>> fetchData() async {
     final response = await http.get(Uri.parse(
         'http://200.19.1.19/20221GR.ADS0013/clinica_medica/Controller/CrudPessoa.php?Operacao=CON&id_pessoa=$idPessoa'));
@@ -75,7 +85,7 @@ class _PerfilViewState extends State<PerfilView> {
               ),
               const SizedBox(height: 40),
               FutureBuilder<Map<String, dynamic>>(
-                future: fetchDataFuture, // Usando fetchDataFuture
+                future: fetchDataFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -142,6 +152,15 @@ class _PerfilViewState extends State<PerfilView> {
                               ],
                             ),
                             const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: _logout,
+                              child: const Text(
+                                'Sair',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),

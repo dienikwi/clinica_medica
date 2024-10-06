@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:clinica_medica/components/bottom_nav_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class EditarPerfilView extends StatefulWidget {
   const EditarPerfilView({super.key});
@@ -14,6 +17,53 @@ class _EditarPerfilViewState extends State<EditarPerfilView> {
   final TextEditingController _generoController = TextEditingController();
   final TextEditingController _dataNascimentoController =
       TextEditingController();
+
+  void _salvarAlteracoes() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? idPessoa = prefs.getInt('id_pessoa');
+
+    if (idPessoa == null) return;
+
+    Map<String, String> dadosParaAtualizar = {};
+
+    if (_nomeController.text.isNotEmpty) {
+      dadosParaAtualizar['nm_pessoa'] = _nomeController.text;
+    }
+    if (_generoController.text.isNotEmpty) {
+      dadosParaAtualizar['nm_genero'] = _generoController.text;
+    }
+    if (_dataNascimentoController.text.isNotEmpty) {
+      dadosParaAtualizar['dt_nascimento'] = _dataNascimentoController.text;
+    }
+
+    if (dadosParaAtualizar.isNotEmpty) {
+      dadosParaAtualizar['Operacao'] = 'EDIT';
+      dadosParaAtualizar['id_pessoa'] = idPessoa.toString();
+
+      var response = await http.post(
+        Uri.parse(
+            'http://200.19.1.19/20221GR.ADS0013/clinica_medica/Controller/CrudPessoa.php'),
+        body: dadosParaAtualizar,
+      );
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        if (jsonResponse['sucesso'] != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Perfil atualizado com sucesso!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erro ao atualizar o perfil')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erro no servidor')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,9 +178,7 @@ class _EditarPerfilViewState extends State<EditarPerfilView> {
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
-                  onPressed: () {
-                    // Salvar as alterações e navegar para outra tela
-                  },
+                  onPressed: _salvarAlteracoes,
                   child: const Text('Salvar'),
                 ),
               ),

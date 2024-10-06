@@ -1,15 +1,22 @@
-import 'package:clinica_medica/views/cadastro/cadastro.view.dart';
+import 'package:clinica_medica/views/home/home.view.dart';
+import 'package:clinica_medica/views/agenda/agenda.view.dart';
 import 'package:flutter/material.dart';
 import 'package:clinica_medica/views/themes/light.theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const Root());
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  int? idPessoa = prefs.getInt('id_pessoa');
+
+  runApp(Root(initialRoute: idPessoa == null ? 'home' : 'agenda'));
 }
 
 class Root extends StatelessWidget {
-  const Root({super.key});
+  final String initialRoute;
+
+  const Root({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +25,11 @@ class Root extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: lightTheme,
-      home: const CadastroView(),
+      initialRoute: initialRoute,
+      routes: {
+        'home': (context) => const HomeView(),
+        'agenda': (context) => const AgendaView()
+      },
     );
   }
 }
